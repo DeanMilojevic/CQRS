@@ -12,4 +12,9 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CQRS.Example\CQRS.Example.csproj" />
+    <ProjectReference Include="..\CQRS\CQRS.csproj" />
+  </ItemGroup>
+
 </Project>
