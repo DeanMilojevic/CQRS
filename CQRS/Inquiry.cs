@@ -21,9 +21,6 @@ namespace CQRS
             _getCommandResult = getCommandResult;
         }
 
-        // give command produced by some factory (which actually returns the ICommand and wraps the actual command)
-        // give query (probably this can be a generic query that produces, eventually, the result of the execution of the command)
-        // this needs to depend on some internal repository of commands executed/executing in the process
         public Answer For(ICommand command)
         {
             EnsureCommandIsProvided(command);

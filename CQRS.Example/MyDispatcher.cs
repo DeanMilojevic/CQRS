@@ -28,7 +28,7 @@ namespace CQRS.Example
             var types = assembly.GetTypes();
             foreach (var command in types.Where(t => t.GetInterface("ICommand") != null))
             {
-                var handler = types.First(t => t.Name == command.Name + "Handler");
+                var handler = types.FirstOrDefault(t => t.Name == command.Name + "Handler");
                 _commandToHandlerMapping[command] = handler ?? throw new ArgumentNullException($"The {command} has no defined handler for it.");
             }
         }
