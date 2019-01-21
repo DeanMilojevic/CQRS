@@ -1,13 +1,11 @@
 ﻿using CQRS.Example;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace CQRS.Tests
 {
     [TestFixture(Description = "Tests for the MyFirstQuery")]
     public class MyFirstQueryTests
     {
-        private IGetCommandResult _getCommandResult;
         private MyDispatcher _dispatcher;
 
         [SetUp]
@@ -17,7 +15,6 @@ namespace CQRS.Tests
             IMailbox mailbox = executionRepository;
             IReportCommandExecution reportCommandExecution = executionRepository;
 
-            _getCommandResult = executionRepository;
             _dispatcher = new MyDispatcher(reportCommandExecution, mailbox);
         }
 
