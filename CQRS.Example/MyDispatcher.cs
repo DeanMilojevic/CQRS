@@ -30,15 +30,17 @@ namespace CQRS.Example
 
             var types = assembly.GetTypes();
 
+            var queryForHandler = new Func<Type[], Type, Type>((all, type) => Array.Find(all, t => t.Name == $"{type.Name}Handler"));
+
             foreach (var command in types.Where(t => t.GetInterface(nameof(ICommand)) != null))
             {
-                var handler = types.FirstOrDefault(t => t.Name == command.Name + "Handler");
+                var handler = queryForHandler(types, command);
                 _commandToHandlerMapping[command] = handler ?? throw new ArgumentNullException($"The {command} has no defined handler.");
             }
 
             foreach (var query in types.Where(t => t.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQuery<>)) != null))
             {
-                var handler = types.FirstOrDefault(t => t.Name == query.Name + "Handler");
+                var handler = queryForHandler(types, query);
                 _queryToHandlerMapping[query] = handler ?? throw new ArgumentNullException($"The {query} has no defined handler.");
             }
         }
@@ -60,9 +62,7 @@ namespace CQRS.Example
 
             var instance = (dynamic)Activator.CreateInstance(handler);
 
-            var result = (T)instance.Handle((dynamic)query);
-
-            return result;
+            return (T)instance.Handle((dynamic)query);
         }
     }
 }
