@@ -1,10 +1,11 @@
-using CQRS.Example;
+﻿using CQRS.Example;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace CQRS.Tests
 {
-    [TestFixture(Description = "Tests for the MyFirstCommand")]
-    public class MyFirstCommandTests
+    [TestFixture]
+    public class MyFirstQueryTests
     {
         private IGetCommandResult _getCommandResult;
         private MyDispatcher _dispatcher;
@@ -21,16 +22,14 @@ namespace CQRS.Tests
         }
 
         [Test]
-        public void WhenExecuted_CommandShouldReportSuccess()
+        public void WhenExecuted_QueryShouldReturnResult()
         {
-            var command = new MyFirstCommand(1, string.Empty);
+            var query = new MyFirstQuery(1);
 
-            _dispatcher.Send(command);
+            var result = _dispatcher.Send(query);
 
-            var inquiry = new Inquiry(_getCommandResult);
-            var answer = inquiry.For(command);
-
-            Assert.IsTrue(answer.Success);
+            var expected = new SomeInfo(1, 2);
+            Assert.AreEqual(expected, result);
         }
     }
 }

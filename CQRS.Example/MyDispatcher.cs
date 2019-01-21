@@ -11,6 +11,7 @@ namespace CQRS.Example
         private readonly IReportCommandExecution _reportCommandExecution;
 
         private readonly Dictionary<Type, Type> _commandToHandlerMapping;
+        private readonly Dictionary<Type, Type> _queryToHandlerMapping;
 
         public MyDispatcher(IReportCommandExecution reportCommandExecution, IMailbox mailbox)
         {
@@ -18,18 +19,27 @@ namespace CQRS.Example
             _mailbox = mailbox;
 
             _commandToHandlerMapping = new Dictionary<Type, Type>();
-            DiscoverCommandsAndHandlers();
+            _queryToHandlerMapping = new Dictionary<Type, Type>();
+
+            Discover();
         }
 
-        private void DiscoverCommandsAndHandlers()
+        private void Discover()
         {
             var assembly = Assembly.GetExecutingAssembly();
 
             var types = assembly.GetTypes();
-            foreach (var command in types.Where(t => t.GetInterface("ICommand") != null))
+
+            foreach (var command in types.Where(t => t.GetInterface(nameof(ICommand)) != null))
             {
                 var handler = types.FirstOrDefault(t => t.Name == command.Name + "Handler");
-                _commandToHandlerMapping[command] = handler ?? throw new ArgumentNullException($"The {command} has no defined handler for it.");
+                _commandToHandlerMapping[command] = handler ?? throw new ArgumentNullException($"The {command} has no defined handler.");
+            }
+
+            foreach (var query in types.Where(t => t.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQuery<>)) != null))
+            {
+                var handler = types.FirstOrDefault(t => t.Name == query.Name + "Handler");
+                _queryToHandlerMapping[query] = handler ?? throw new ArgumentNullException($"The {query} has no defined handler.");
             }
         }
 
@@ -42,6 +52,17 @@ namespace CQRS.Example
             var instance = (dynamic)Activator.CreateInstance(handler, _reportCommandExecution);
 
             instance.Handle((dynamic)command);
+        }
+
+        public T Send<T>(IQuery<T> query)
+        {
+            var handler = _queryToHandlerMapping[query.GetType()];
+
+            var instance = (dynamic)Activator.CreateInstance(handler);
+
+            var result = (T)instance.Handle((dynamic)query);
+
+            return result;
         }
     }
 }
