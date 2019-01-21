@@ -30,7 +30,7 @@ namespace CQRS.Example
 
             var types = assembly.GetTypes();
 
-            var queryForHandler = new Func<Type[], Type, Type>((all, type) => Array.Find(all, t => t.Name == $"{type.Name}Handler"));
+            var queryForHandler = new Func<Type[], Type, Type>((all, type) => Array.Find(all, t => string.Equals(t.Name, $"{type.Name}Handler")));
 
             foreach (var command in types.Where(t => t.GetInterface(nameof(ICommand)) != null))
             {
