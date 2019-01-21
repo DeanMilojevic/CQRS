@@ -23,13 +23,15 @@ namespace CQRS.Tests
         [Test]
         public void WhenExecuted_CommandShouldReportSuccess()
         {
+            // arrange
             var command = new MyFirstCommand(1, string.Empty);
 
+            // act
             _dispatcher.Send(command);
-
             var inquiry = new Inquiry(_getCommandResult);
             var answer = inquiry.For(command);
 
+            // assert
             Assert.IsTrue(answer.Success);
         }
     }

@@ -4,7 +4,7 @@ using NUnit.Framework.Internal;
 
 namespace CQRS.Tests
 {
-    [TestFixture]
+    [TestFixture(Description = "Tests for the MyFirstQuery")]
     public class MyFirstQueryTests
     {
         private IGetCommandResult _getCommandResult;
@@ -24,11 +24,14 @@ namespace CQRS.Tests
         [Test]
         public void WhenExecuted_QueryShouldReturnResult()
         {
+            // arrange
             var query = new MyFirstQuery(1);
+            var expected = new SomeInfo(1, 2);
 
+            // act
             var result = _dispatcher.Send(query);
 
-            var expected = new SomeInfo(1, 2);
+            // assert
             Assert.AreEqual(expected, result);
         }
     }
